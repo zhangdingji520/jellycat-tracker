@@ -1,0 +1,43 @@
+name: Build iOS IPA for TrollStore
+
+on:
+  workflow_dispatch:  # 允许在网页上手动点击运行
+
+jobs:
+  build:
+    runs-on: macos-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.24.0'  # 根据项目要求锁定版本
+          channel: 'stable'
+
+      - name: Install dependencies
+        run: |
+          cd jellycat_app
+          flutter pub get
+          cd ios
+          pod install
+          cd ../..
+
+      - name: Build unsigned IPA
+        run: |
+          cd jellycat_app
+          flutter build ios --release --no-codesign
+
+      - name: Package IPA
+        run: |
+          mkdir -p Payload
+          cp -r jellycat_app/build/ios/iphoneos/Runner.app Payload/
+          zip -r JellycatTracker.ipa Payload
+          rm -rf Payload
+
+      - name: Upload IPA
+        uses: actions/upload-artifact@v4
+        with:
+          name: JellycatTracker
+          path: JellycatTracker.ipa

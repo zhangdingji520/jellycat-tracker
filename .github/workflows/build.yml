@@ -1,7 +1,7 @@
 name: Build iOS IPA for TrollStore
 
 on:
-  workflow_dispatch:  # 允许在网页上手动点击运行
+  workflow_dispatch:
 
 jobs:
   build:
@@ -13,16 +13,13 @@ jobs:
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.24.0'  # 根据项目要求锁定版本
+          flutter-version: '3.27.0'  # 改成当前最稳定版本
           channel: 'stable'
 
       - name: Install dependencies
         run: |
           cd jellycat_app
           flutter pub get
-          cd ios
-          pod install
-          cd ../..
 
       - name: Build unsigned IPA
         run: |

@@ -1,4 +1,4 @@
-name: iOS-ipa-build
+name: jellycat-tracker
 
 on:
   workflow_dispatch:

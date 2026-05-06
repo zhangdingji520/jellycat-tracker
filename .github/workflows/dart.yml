@@ -1,7 +1,9 @@
 name: jellycat-tracker
 
 on:
-  workflow_dispatch:
+  workflow_dispatch: # 允许你手动点击运行
+  push:
+    branches: [ main ] # 每次你修改代码提交后也会自动运行
 
 jobs:
   build-ios:
@@ -14,29 +16,35 @@ jobs:
         with:
           channel: 'stable'
           architecture: x64
-      - run: flutter pub get
-      
+          
+      - name: 获取 Flutter 依赖
+        run: flutter pub get
+        
+      # 【关键修复步】让云端服务器帮你生成缺失的 iOS 工程文件夹！
+      - name: 自动生成 iOS 工程目录
+        run: flutter create --platforms=ios .
 
-      - run: pod repo update
-        working-directory: lib
+      # 【关键修复步】将原本错误的 build lib 改为 build ios
+      - name: 编译 iOS 无签名版本
+        run: flutter build ios --release --no-codesign
 
-      - run: flutter build lib --release --no-codesign
-
-      - run: mkdir Payload
+      - name: 创建 Payload 文件夹准备打包
+        run: mkdir Payload
         working-directory: build/ios/iphoneos
 
-      - run: mv Runner.app/ Payload
+      - name: 将编译好的 app 移入 Payload
+        run: mv Runner.app/ Payload
         working-directory: build/ios/iphoneos
 
-      - name: Zip output
+      - name: 压缩生成 IPA 文件
         run: zip -qq -r -9 FlutterIpaExport.ipa Payload
         working-directory: build/ios/iphoneos
 
-      - name: Upload binaries to release
+      - name: 上传到 Release 页面供下载
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: build/ios/iphoneos/FlutterIpaExport.ipa
           tag: v1.0
           overwrite: true
-          body: "This is first release"
+          body: "这是 Jellycat 图鉴 App 的第一个版本！使用巨魔安装。"

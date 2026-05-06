@@ -22,6 +22,11 @@ class CatalogPage extends ConsumerWidget {
             elevation: 2,
             margin: const EdgeInsets.only(bottom: 12),
             child: ListTile(
+              // 【新增这里】当手指点击这一行时触发
+              onTap: () {
+                // 通知 Notifier 执行 toggleOwnership 方法
+                ref.read(catalogProvider.notifier).toggleOwnership(item.id);
+              },
               leading: CircleAvatar(
                 backgroundColor: item.isOwned ? Colors.green : Colors.grey.shade300,
                 child: Icon(

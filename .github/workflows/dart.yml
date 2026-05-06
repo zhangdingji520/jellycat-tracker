@@ -1,11 +1,11 @@
-name: iOS-ipa-build
+name: jellycat-tracker
 
 on:
   workflow_dispatch:
 
 jobs:
   build-ios:
-    name: 🎉 iOS Build
+    name: 🎉 jellycat-tracker
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v3
@@ -18,7 +18,7 @@ jobs:
       
 
       - run: pod repo update
-        working-directory: ios
+        working-directory: lib
 
       - run: flutter build ios --release --no-codesign
 
